@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine.UI;
+using SimpleJSON;
 
 namespace MorphMerger
 {
@@ -282,15 +283,7 @@ namespace MorphMerger
                     string mainMetaPath = characterSelector.morphBank1.autoImportFolder + $"/{morphName}-{rndId}.vmi";
                     string mainDeltasPath = characterSelector.morphBank1.autoImportFolder + $"/{morphName}-{rndId}.vmb";
 
-                    var mainMeta = mainMorph.GetMetaJSON();
-                    if (mainMeta == null)
-                        throw new InvalidOperationException("Failed to generate meta data");
-
-                    SaveJSON(mainMeta, mainMetaPath);
-                    mainMorph.SaveDeltasToBinaryFile(mainDeltasPath);
-
-                    WriteToResultField($"Saved VMI: \"{mainMetaPath}\"");
-                    WriteToResultField($"Saved VMB \"{mainDeltasPath}\"");
+                    SaveMorphData(mainMorph, mainMetaPath, mainDeltasPath);
                 }
 
                 // Genital
@@ -300,15 +293,7 @@ namespace MorphMerger
                     string genMetaPath = characterSelector.morphBank2.autoImportFolder + $"/{morphName}-{rndId}-Genital.vmi";
                     string genDeltasPath = characterSelector.morphBank2.autoImportFolder + $"/{morphName}-{rndId}-Genital.vmb";
 
-                    var genMeta = genMorph.GetMetaJSON();
-                    if (genMeta == null)
-                        throw new InvalidOperationException("Failed to generate gen meta data");
-
-                    SaveJSON(genMeta, genMetaPath);
-                    genMorph.SaveDeltasToBinaryFile(genDeltasPath);
-
-                    WriteToResultField($"Saved Genital VMI: \"{genMetaPath}\"");
-                    WriteToResultField($"Saved Genital VMB: \"{genDeltasPath}\"");
+                    SaveMorphData(mainMorph, genMetaPath, genDeltasPath);
                 }
             }
             catch (Exception e)
@@ -344,16 +329,9 @@ namespace MorphMerger
                     string mainMetaPath = characterSelector.morphBank1.autoImportFolder + $"/{tempName}-{rndId}.vmi";
                     string mainDeltasPath = characterSelector.morphBank1.autoImportFolder + $"/{tempName}-{rndId}.vmb";
 
-                    var mainMeta = mainMorph.GetMetaJSON();
-                    if (mainMeta == null)
-                        throw new InvalidOperationException("Failed to generate meta data");
-
-                    SaveJSON(mainMeta, mainMetaPath);
-                    mainMorph.SaveDeltasToBinaryFile(mainDeltasPath);
-
-                    WriteToResultField($"Saved VMI: \"{mainMetaPath}\"");
-                    WriteToResultField($"Saved VMB \"{mainDeltasPath}\"");
+                    SaveMorphData(mainMorph, mainMetaPath, mainDeltasPath);
                 }
+
                 //BODY - just inverse head filter
                 tempName = morphName + "-Body";
                 vertexFilter.invert = true;
@@ -363,16 +341,7 @@ namespace MorphMerger
                     string mainMetaPath = characterSelector.morphBank1.autoImportFolder + $"/{tempName}-{rndId}.vmi";
                     string mainDeltasPath = characterSelector.morphBank1.autoImportFolder + $"/{tempName}-{rndId}.vmb";
 
-
-                    var mainMeta = mainMorph.GetMetaJSON();
-                    if (mainMeta == null)
-                        throw new InvalidOperationException("Failed to generate meta data");
-
-                    SaveJSON(mainMeta, mainMetaPath);
-                    mainMorph.SaveDeltasToBinaryFile(mainDeltasPath);
-
-                    WriteToResultField($"Saved VMI: \"{mainMetaPath}\"");
-                    WriteToResultField($"Saved VMB \"{mainDeltasPath}\"");
+                    SaveMorphData(mainMorph, mainMetaPath, mainDeltasPath);
                 }
 
                 // Genital
@@ -382,15 +351,7 @@ namespace MorphMerger
                     string genMetaPath = characterSelector.morphBank2.autoImportFolder + $"/{morphName}-{rndId}-Genital.vmi";
                     string genDeltasPath = characterSelector.morphBank2.autoImportFolder + $"/{morphName}-{rndId}-Genital.vmb";
 
-                    var genMeta = genMorph.GetMetaJSON();
-                    if (genMeta == null)
-                        throw new InvalidOperationException("Failed to generate gen meta data");
-
-                    SaveJSON(genMeta, genMetaPath);
-                    genMorph.SaveDeltasToBinaryFile(genDeltasPath);
-
-                    WriteToResultField($"Saved Genital VMI: \"{genMetaPath}\"");
-                    WriteToResultField($"Saved Genital VMB: \"{genDeltasPath}\"");
+                    SaveMorphData(mainMorph, genMetaPath, genDeltasPath);
                 }
                 
                 //_person.GetComponentInChildren<DAZCharacterSelector>().morphBank1.RebuildAllLookups();
@@ -399,6 +360,19 @@ namespace MorphMerger
             {
                 SuperController.LogError("Exception caught: " + e);
             }
+        }
+
+        private void SaveMorphData(DAZMorph mergedMorph, string metaPath, string deltasPath)
+        {
+            var metaData = mergedMorph.GetMetaJSON();
+            if (metaData == null)
+                throw new InvalidOperationException("Failed to generate meta data");
+
+            SaveJSON(metaData, metaPath);
+            mergedMorph.SaveDeltasToBinaryFile(deltasPath);
+
+            WriteToResultField($"Saved VMI: \"{metaPath}\"");
+            WriteToResultField($"Saved VMB \"{deltasPath}\"");
         }
 
         private void ClearResultField()
